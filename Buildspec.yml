@@ -1,0 +1,25 @@
+version: 0.2
+
+env:
+  parameter-store:
+      DOCKER_REGISTRY_USERNAME: docker-credentials-username
+      DOCKER_REGISTRY_PASSWORD: docker-credentials-password
+      DOCKER_REGISTRY_URL: docker-credentials-url
+
+phases:
+  install:
+    commands:
+      - echo "Installing Node.js 18"
+      - n 20
+  pre_build:
+    commands:
+      - echo "Building docker image" 
+  build:
+    commands:
+      - echo "$DOCKER_REGISTRY_PASSWORD" | docker login -u "$DOCKER_REGISTRY_USERNAME" --password-stdin "$DOCKER_REGISTRY_URL"
+      - docker build -t "docker.io/$DOCKER_REGISTRY_USERNAME/crypto-app:latest" .
+      - docker push "docker.io/$DOCKER_REGISTRY_USERNAME/crypto-app:latest"
+      - echo "Pushed successfully"
+  post_build:
+    commands:
+      - echo "Build Successful"
